@@ -1,48 +1,62 @@
-#include <iostream>
 #include <irrlicht.h>
+#include <iostream>
+#include <stdio.h>
 
 using namespace irr;
+
+
 int main() {
-    std::cout << "test out" << std::endl;
+    video::E_DRIVER_TYPE driverType = video::EDT_OPENGL;
 
-    IrrlichtDevice *device = createDevice(video::EDT_SOFTWARE, core::dimension2d<u32>(640, 480), 16, false, false, false, 0);
-
-    if (!device)
-        return 1;
-
-    device->setWindowCaption(L"Irrlicht Engine");
+    IrrlichtDevice *device = createDevice(driverType, core::dimension2d<u32>(640, 480));
+    if (device == 0) return 1;
 
     video::IVideoDriver *driver = device->getVideoDriver();
     scene::ISceneManager *smgr = device->getSceneManager();
-    gui::IGUIEnvironment *guienv = device->getGUIEnvironment();
 
-    guienv->addStaticText(L"Hello World!", core::rect<s32>(10, 10, 260, 22), true);
+    // Debug current directory
+    io::path working_dir = device->getFileSystem()->getWorkingDirectory();
+    std::cout << working_dir.c_str() << std::endl;
 
-    // TODO: Fix this absolute path later.
-    scene::IAnimatedMesh *mesh = smgr->getMesh("/home/christian/bin/fallux/res/meshes/sydney.md2");
-    if (!mesh) {
-        device->drop();
-        return 1;
-    }
-    scene::IAnimatedMeshSceneNode *node = smgr->addAnimatedMeshSceneNode(mesh);
+    device->getFileSystem()->addFileArchive("res/meshes/map-20kdm2.pk3");
 
-    if (node) {
-        node->setMaterialFlag(video::EMF_LIGHTING, false);
-        node->setMD2Animation(scene::EMAT_STAND);
-        node->setMaterialTexture(0, driver->getTexture("/home/christian/bin/fallux/res/textures/sydney.bmp"));
-    }
+    scene::IAnimatedMesh *mesh = smgr->getMesh("20kdm2.bsp");
+    scene::ISceneNode *node = 0;
 
-    smgr->addCameraSceneNode(0, core::vector3df(0, 30, -40), core::vector3df(0, 5, 0));
+    if (mesh)
+        //node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
+        node = smgr->addMeshSceneNode(mesh->getMesh(0));
 
-    while (device->run()) {
-        driver->beginScene(true, true, video::SColor(255, 100, 101, 140));
+    if (node)
+        node->setPosition(core::vector3df(-1300, -144, -1249));
 
-        smgr->drawAll();
-        guienv->drawAll();
+    smgr->addCameraSceneNodeFPS();
+    device->getCursorControl()->setVisible(false);
 
-        driver->endScene();
+    int lastFPS = -1;
+    core::stringw caption = L"";
+    while(device->run()) {
+        if (device->isWindowActive()) {
+            driver->beginScene(true, true, video::SColor(255, 200, 200, 200));
+            smgr->drawAll();
+            driver->endScene();
+
+            int fps = driver->getFPS();
+
+            if (lastFPS != fps) {
+                caption = L"Quake 3 Map [";
+                caption += driver->getName();
+                caption += "] FPS: " + fps;
+            }
+
+            device->setWindowCaption(caption.c_str());
+            lastFPS = fps;
+        } else {
+            device->yield();
+        }
     }
 
     device->drop();
+    //game.shutdown() // game holds device.
     return 0;
 }
