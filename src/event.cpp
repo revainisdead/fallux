@@ -2,18 +2,20 @@
 #include "event.h"
 
 
+using namespace irr;
+
 MyEventReceiver::MyEventReceiver() {
     for (u32 i=0; i<KEY_KEY_CODES_COUNT; i++) {
-        KeysIsDown[i] = false;
+        KeyIsDown[i] = false;
     }
 }
 
-virtual bool MyEventReceiver::OnEvent(const SEvent& event) {
+bool MyEventReceiver::OnEvent(const SEvent& event) {
     if (event.EventType == irr::EET_KEY_INPUT_EVENT)
         KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
     return false;
 }
 
-virtual bool MyEventReceiver::IsKeyDown(EKEY_CODE keyCode) {
+bool MyEventReceiver::IsKeyDown(EKEY_CODE keyCode) const {
     return KeyIsDown[keyCode];
 }
