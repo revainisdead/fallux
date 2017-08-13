@@ -4,6 +4,7 @@
 #include <irrlicht.h>
 #include <vector>
 #include "constants.h"
+#include "event.h"
 
 
 using namespace irr;
@@ -25,14 +26,20 @@ class Game {
         //void shutdown();
 
     private:
-        IrrlichtDevice *device;
-        video::IVideoDriver *driver;
-        scene::ISceneManager *smgr;
-        io::path working_dir;
-        core::stringw caption;
+        void update();
 
         std::vector<scene::IAnimatedMesh*> meshes;
         std::vector<scene::ISceneNode*> nodes;
+
+        IrrlichtDevice *device;
+        video::IVideoDriver *driver;
+        scene::ISceneManager *smgr;
+        //EventReceiver event_r;
+        scene::ITriangleSelector *selector;
+        scene::ICameraSceneNode *camera;
+
+        io::path working_dir;
+        core::stringw caption;
 };
 
 #endif
