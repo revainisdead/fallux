@@ -6,6 +6,6 @@
 
 
 //static const core::stringw CAPTION = L"Fallux - Irrlicht Engine";
-static const irr::s32 GRAVITY_CON = -12;
+static const irr::s32 GRAVITY_CON = -10;
 
 #endif
