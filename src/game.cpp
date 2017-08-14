@@ -18,6 +18,7 @@ Game::Game() {
 
     highlightedSceneNode = 0;
 
+    //video::SMaterial material = *(new video::SMaterial());
     material.setTexture(0, 0);
     material.Lighting = false;
     material.Wireframe = true;
@@ -127,12 +128,15 @@ void Game::setup_guy() {
     node->setScale(core::vector3df(10));
     node->setPosition(core::vector3df(-75, -66, -80));
     node->setRotation(core::vector3df(0, 90, 0));
+    node->setAnimationSpeed(8.f);
     node->getMaterial(0).NormalizeNormals = true;
     node->getMaterial(0).Lighting = true;
     guy_selector = smgr->createTriangleSelector(node);
     node->setTriangleSelector(guy_selector);
 
 
+
+    // Setup light
     scene::ILightSceneNode *light = smgr->addLightSceneNode(0, core::vector3df(-60, 100, 400), video::SColorf(1.0f, 1.0f, 1.0f, 1.0f), 600.0f);
     light->setID(ID_IsNotPickable);
 
@@ -173,19 +177,19 @@ void Game::__raycast_intersect() {
             0
         );
 
-        if (selectedSceneNode) {
-            bill->setPosition(intersection);
+    if (selectedSceneNode) {
+        bill->setPosition(intersection);
 
-            // Reset transform before we can do our own render.
-            driver->setTransform(video::ETS_WORLD, core::matrix4());
-            driver->setMaterial(material);
-            driver->draw3DTriangle(hitTriangle, video::SColor(0, 255, 0, 0));
-        }
+        // Reset transform before we can do our own render.
+        driver->setTransform(video::ETS_WORLD, core::matrix4());
+        driver->setMaterial(material);
+        driver->draw3DTriangle(hitTriangle, video::SColor(0, 255, 0, 0));
 
-        if ((selectedSceneNode->getID() & IDFlag_IsHighlightable) == IDFlag_IsHighlightable) {
+        if ((selectedSceneNode->getID() && IDFlag_IsHighlightable) == IDFlag_IsHighlightable) {
             highlightedSceneNode = selectedSceneNode;
+            highlightedSceneNode->setMaterialFlag(video::EMF_LIGHTING, false);
         }
-
+    }
 }
 
 void Game::update() {
